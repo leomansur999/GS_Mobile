@@ -1,3 +1,7 @@
+# Integrantes do Projeto
+Rm 99805 João Pedro de Souza Vieira
+Rm 551659 Leonardo Nicastro Mansur Castillo
+
 # Usando API do DummyJson
 
 A proposta deste projeto é mostrar posts contidos de história e ficção contidos no DummyJson.
