@@ -1,5 +1,6 @@
 export type Evento = {
-  location: string;
-  time: string;
-  damage: string;
+  id: string;
+  localizacao: string;
+  tempo: string;
+  prejuizos: string;
 };

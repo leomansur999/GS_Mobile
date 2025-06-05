@@ -1,39 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { View, Text, Button, FlatList } from 'react-native';
+import { carregarEventos } from '../utils/Armazenamento';
 import { Evento } from '../types/Evento';
-import { getData } from '../utils/Armazenamento';
 
-export default function PanoramaGeral() {
-  const [events, setEvents] = useState<Evento[]>([]);
+export default function PanoramaGeral({ navigation }: any) {
+  const [eventos, setEventos] = useState<Evento[]>([]);
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      const stored = await getData('events');
-      if (stored) setEvents(stored);
+    const fetchData = async () => {
+      const dados = await carregarEventos();
+      setEventos(dados);
     };
-    fetchEvents();
-  }, []);
+    const unsubscribe = navigation.addListener('focus', fetchData);
+    return unsubscribe;
+  }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Eventos Registrados</Text>
+    <View style={{ flex: 1, padding: 16 }}>
+      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Eventos Registrados</Text>
       <FlatList
-        data={events}
-        keyExtractor={(_, index) => index.toString()}
+        data={eventos}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.card}>
-            <Text>Local: {item.location}</Text>
-            <Text>Tempo: {item.time}h</Text>
-            <Text>Prejuízos: {item.damage}</Text>
+          <View style={{ marginVertical: 8 }}>
+            <Text>📍 Local: {item.localizacao}</Text>
+            <Text>⏱️ Tempo: {item.tempo}</Text>
+            <Text>💥 Prejuízos: {item.prejuizos}</Text>
           </View>
         )}
       />
+      <Button title="Nova Localização" onPress={() => navigation.navigate('Localização Atingida')} />
+      <Button title="Registrar Tempo" onPress={() => navigation.navigate('Tempo de Interrupção')} />
+      <Button title="Registrar Prejuízos" onPress={() => navigation.navigate('Prejuízos Causados')} />
+      <Button title="Ver Recomendações" onPress={() => navigation.navigate('Recomendações')} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-  card: { backgroundColor: '#eee', padding: 10, marginBottom: 10, borderRadius: 8 }
-});

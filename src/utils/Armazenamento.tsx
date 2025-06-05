@@ -1,20 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Evento } from '../types/Evento';
 
-export const storeData = async (key: string, value: any): Promise<void> => {
-  try {
-    const jsonValue = JSON.stringify(value);
-    await AsyncStorage.setItem(key, jsonValue);
-  } catch (e) {
-    console.error('Erro ao salvar dados', e);
-  }
-};
+const STORAGE_KEY = '@eventos';
 
-export const getData = async (key: string): Promise<any | null> => {
-  try {
-    const jsonValue = await AsyncStorage.getItem(key);
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch (e) {
-    console.error('Erro ao recuperar dados', e);
-    return null;
-  }
-};
+export async function salvarEvento(evento: Evento) {
+  const eventosString = await AsyncStorage.getItem(STORAGE_KEY);
+  const eventos: Evento[] = eventosString ? JSON.parse(eventosString) : [];
+  eventos.push(evento);
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(eventos));
+}
+
+export async function carregarEventos(): Promise<Evento[]> {
+  const eventosString = await AsyncStorage.getItem(STORAGE_KEY);
+  return eventosString ? JSON.parse(eventosString) : [];
+}

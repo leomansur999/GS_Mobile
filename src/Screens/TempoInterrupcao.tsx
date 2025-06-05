@@ -1,38 +1,30 @@
 import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { View, TextInput, Button } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Evento } from '../types/Evento';
-import { getData, storeData } from '../utils/Armazenamento';
 
-export default function TempoInterrupcao() {
-  const [time, setTime] = useState<string>('');
+export default function TempoInterrupcao({ navigation }: any) {
+  const [tempo, setTempo] = useState('');
 
-  const saveTime = async () => {
-    const events: Evento[] = (await getData('events')) || [];
-    if (events.length > 0) {
-      events[events.length - 1].time = time;
-      await storeData('events', events);
-      setTime('');
-      alert('Tempo salvo!');
+  const salvar = async () => {
+    const eventosString = await AsyncStorage.getItem('@eventos');
+    const eventos: Evento[] = eventosString ? JSON.parse(eventosString) : [];
+    if (eventos.length > 0) {
+      eventos[eventos.length - 1].tempo = tempo;
+      await AsyncStorage.setItem('@eventos', JSON.stringify(eventos));
     }
+    navigation.navigate('PanoramaGeral');
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Tempo sem energia (em horas)</Text>
+    <View style={{ padding: 16 }}>
       <TextInput
-        style={styles.input}
-        value={time}
-        onChangeText={setTime}
-        keyboardType="numeric"
-        placeholder="Ex: 5"
+        placeholder="Digite o tempo de interrupção"
+        value={tempo}
+        onChangeText={setTempo}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
-      <Button title="Salvar Tempo" onPress={saveTime} />
+      <Button title="Salvar" onPress={salvar} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  label: { fontSize: 16, marginBottom: 10 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, borderRadius: 5 }
-});

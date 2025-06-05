@@ -1,35 +1,32 @@
 import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { View, TextInput, Button } from 'react-native';
+import { salvarEvento } from '../utils/Armazenamento';
 import { Evento } from '../types/Evento';
-import { getData, storeData } from '../utils/Armazenamento';
+import uuid from 'react-native-uuid';
 
-export default function LocalizacaoAtingida() {
-  const [location, setLocation] = useState<string>('');
+export default function LocalizacaoAtingida({ navigation }: any) {
+  const [local, setLocal] = useState('');
 
-  const saveLocation = async () => {
-    const events: Evento[] = (await getData('events')) || [];
-    const newEvent: Evento = { location, time: '', damage: '' };
-    await storeData('events', [...events, newEvent]);
-    setLocation('');
-    alert('Localização salva!');
+  const salvar = async () => {
+    const novoEvento: Evento = {
+      id: String(uuid.v4()),
+      localizacao: local,
+      tempo: '',
+      prejuizos: '',
+    };
+    await salvarEvento(novoEvento);
+    navigation.navigate('PanoramaGeral');
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Bairro/Cidade/CEP</Text>
+    <View style={{ padding: 16 }}>
       <TextInput
-        style={styles.input}
-        value={location}
-        onChangeText={setLocation}
         placeholder="Digite a localização"
+        value={local}
+        onChangeText={setLocal}
+        style={{ borderWidth: 1, marginBottom: 10, padding: 8 }}
       />
-      <Button title="Salvar Localização" onPress={saveLocation} />
+      <Button title="Salvar" onPress={salvar} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  label: { fontSize: 16, marginBottom: 10 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, borderRadius: 5 }
-});
